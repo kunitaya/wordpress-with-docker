@@ -1,0 +1,32 @@
+version: '3'
+services:
+  nginx:
+    image: nginx:mainline-alpine
+    volumes:
+      - ./server.conf:/etc/nginx/conf.d/server.conf
+      - ./htdocs:/var/www/html
+    ports:
+      - "10080:80"
+    depends_on:
+      - wordpress
+    links:
+      - wordpress
+
+  wordpress:
+    image: wordpress:php7.2-fpm-alpine
+    volumes:
+      - ./htdocs:/var/www/html
+    env_file: wordpress.env
+    depends_on:
+      - mysql
+    links:
+      - mysql
+
+  mysql:
+    restart: always
+    image: mysql:latest
+    volumes:
+      - ./dbdata:/var/lib/mysql
+    env_file: mysql.env
+    ports:
+      - "13306:3306"
